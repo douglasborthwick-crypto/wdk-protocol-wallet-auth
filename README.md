@@ -4,7 +4,7 @@
 
 A [Wallet Development Kit](https://docs.wdk.tether.io/) protocol module that adds a new protocol category alongside Swap, Bridge, Lending, and Fiat: **pre-transaction, condition-based access.** Given a wallet and a set of on-chain conditions, it returns a cryptographically signed pass/fail (`attest`) or a multi-dimensional trust profile (`trust`). Results are ECDSA P-256 signed and verifiable offline against a public JWKS — no secrets, no identity-first, no static credentials.
 
-Powered by [InsumerAPI](https://insumermodel.com). Supports 33 chains including all networks used by [tether.wallet](https://tether.wallet) and WDK-based wallets (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, Plasma, Solana, TRON, TON, Bitcoin, XRPL, and more).
+Powered by [InsumerAPI](https://insumermodel.com). Covers **33 chains**: 30 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, and the rest of the major EVM set), plus Solana, XRPL, and Bitcoin. Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TRON, TON, and Lightning/Spark are on the roadmap — WDK apps on those runtimes can still call `attest()` / `trust()` against any EVM, Solana, Bitcoin, or XRPL address the user holds.
 
 ## Why this exists
 
@@ -45,7 +45,7 @@ Get an API key at [insumermodel.com](https://insumermodel.com) (free tier availa
 
 ### Buying credits
 
-The free tier ships 100 attestation credits. When you need more, credits can be purchased on-chain with **USDC, USDT, or BTC** via `POST /v1/credits/buy` — no Stripe, no signup, no fiat. Supported payment rails:
+The free tier ships **10 attestation credits** on every new key — enough to exercise the module end-to-end before you spend anything. When you need more, credits can be purchased on-chain with **USDC, USDT, or BTC** via `POST /v1/credits/buy` — no Stripe, no signup, no fiat. Supported payment rails:
 
 - **USDC or USDT** on any major EVM chain (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, and more) — the endpoint auto-detects which stablecoin you sent.
 - **USDC** on Solana.

@@ -1,6 +1,6 @@
 {
   "name": "@insumermodel/wdk-protocol-wallet-auth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WDK protocol module for wallet auth — cryptographically signed, pre-transaction condition-based access. OAuth proves who you are; wallet auth proves what you hold. Powered by InsumerAPI.",
   "keywords": [
     "wdk",
