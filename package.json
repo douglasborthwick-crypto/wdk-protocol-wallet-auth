@@ -1,0 +1,66 @@
+{
+  "name": "@insumermodel/wdk-protocol-wallet-auth",
+  "version": "0.1.0",
+  "description": "WDK protocol module for wallet auth — cryptographically signed, pre-transaction condition-based access. OAuth proves who you are; wallet auth proves what you hold. Powered by InsumerAPI.",
+  "keywords": [
+    "wdk",
+    "protocol",
+    "wallet-auth",
+    "condition-based-access",
+    "attestation",
+    "trust",
+    "insumerapi"
+  ],
+  "author": "Douglas Borthwick <douglas@insumermodel.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/douglasborthwick-crypto/wdk-protocol-wallet-auth.git"
+  },
+  "homepage": "https://insumermodel.com/developers/wdk/",
+  "bugs": {
+    "url": "https://github.com/douglasborthwick-crypto/wdk-protocol-wallet-auth/issues"
+  },
+  "main": "index.js",
+  "type": "module",
+  "types": "./types",
+  "files": [
+    "index.js",
+    "src/",
+    "types/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "lint": "standard",
+    "lint:fix": "standard --fix"
+  },
+  "peerDependencies": {
+    "@tetherto/wdk-wallet": "^1.0.0-beta.1"
+  },
+  "peerDependenciesMeta": {
+    "@tetherto/wdk-wallet": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "standard": "^17.1.2"
+  },
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./index.js"
+    },
+    "./package": {
+      "default": "./package.json"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
