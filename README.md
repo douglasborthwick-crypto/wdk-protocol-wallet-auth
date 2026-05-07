@@ -2,7 +2,7 @@
 
 > **Wallet auth for WDK wallets.** OAuth proves who you are. Wallet auth proves what you hold.
 
-A [Wallet Development Kit](https://docs.wdk.tether.io/) protocol module that adds a new protocol category alongside Swap, Bridge, Lending, and Fiat: **pre-transaction, condition-based access.** Given a wallet and a set of on-chain conditions, it returns a cryptographically signed pass/fail (`attest`) or a multi-dimensional trust profile (`trust`). Results are ECDSA P-256 signed and verifiable offline against a public JWKS — no secrets, no identity-first, no static credentials.
+A [Wallet Development Kit](https://docs.wdk.tether.io/) protocol module that exposes the wallet auth primitive (read → evaluate → sign) inside the WDK shape, alongside Swap, Bridge, Lending, and Fiat. **Pre-transaction, condition-based access.** Given a wallet and a set of on-chain conditions, it returns a cryptographically signed pass/fail (`attest`) or a multi-dimensional trust profile (`trust`). Results are ECDSA P-256 signed and verifiable offline against a public JWKS — no secrets, no identity-first, no static credentials.
 
 Powered by [InsumerAPI](https://insumermodel.com). Covers **33 chains**: 30 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, and the rest of the major EVM set), plus Solana, XRPL, and Bitcoin. Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TRON, TON, and Lightning/Spark are on the roadmap — WDK apps on those runtimes can still call `attest()` / `trust()` against any EVM, Solana, Bitcoin, or XRPL address the user holds.
 
