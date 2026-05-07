@@ -41,11 +41,18 @@ Use cases:
 npm install @insumermodel/wdk-protocol-wallet-auth
 ```
 
-Get an API key at [insumermodel.com](https://insumermodel.com) (free tier available).
+### Provisioning a key
 
-### Buying credits
+Two ways to provision an API key. Either flow ships **10 free attestation credits**, enough to exercise the module end-to-end before paying anything.
 
-The free tier ships **10 attestation credits** on every new key — enough to exercise the module end-to-end before you spend anything. When you need more, credits can be purchased on-chain with **USDC, USDT, or BTC** via `POST /v1/credits/buy` — no Stripe, no signup, no fiat. Supported payment rails:
+- **Email signup** (human-managed wallet apps): `POST /v1/keys/create` with `{ email, appName, tier: "free" }`, or use the form at [insumermodel.com](https://insumermodel.com). No credit card.
+- **On-chain** (autonomous agent operating its own WDK wallet): send USDC, USDT, or BTC to the platform wallet, then `POST /v1/keys/buy` with the transaction hash. The transaction sender wallet is the identity, the payment is the auth. No email, no human in the loop.
+
+Set the resulting key as `INSUMER_API_KEY` in your runtime.
+
+### Topping up credits
+
+Top up an existing key on-chain via `POST /v1/credits/buy` — no Stripe, no fiat. Supported payment rails:
 
 - **USDC or USDT** on any major EVM chain (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, and more) — the endpoint auto-detects which stablecoin you sent.
 - **USDC** on Solana.
