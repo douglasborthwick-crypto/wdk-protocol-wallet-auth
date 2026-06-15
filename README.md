@@ -2,22 +2,45 @@
 
 > **Wallet auth for WDK wallets.** OAuth proves who you are. Wallet auth proves what you hold.
 
-A [Wallet Development Kit](https://docs.wdk.tether.io/) protocol module that exposes the wallet auth primitive (read → evaluate → sign) inside the WDK shape, alongside Swap, Bridge, Lending, and Fiat. **Pre-transaction, condition-based access.** Given a wallet and a set of on-chain conditions, it returns a cryptographically signed pass/fail (`attest`) or a multi-dimensional trust profile (`trust`). Results are ECDSA P-256 signed and verifiable offline against a public JWKS — no secrets, no identity-first, no static credentials.
+The wallet auth primitive (read → evaluate → sign) packaged for [Wallet Development Kit](https://docs.wdk.tether.io/) apps. **Pre-transaction, condition-based access.** Given a wallet and a set of on-chain conditions, it returns a cryptographically signed pass/fail (`attest`) or a multi-dimensional trust profile (`trust`). Results are ECDSA P-256 signed and verifiable offline against a public JWKS — no secrets, no identity-first, no static credentials. It composes with WDK's transaction policy engine as a signed condition, and works standalone anywhere else.
 
-Powered by [InsumerAPI](https://insumermodel.com). Covers **33 chains**: 30 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, and the rest of the major EVM set), plus Solana, XRPL, and Bitcoin. Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TRON, TON, and Lightning/Spark are on the roadmap — WDK apps on those runtimes can still call `attest()` / `trust()` against any EVM, Solana, Bitcoin, or XRPL address the user holds.
+Powered by [InsumerAPI](https://insumermodel.com). `attest()` covers **37 chains**: 31 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, and the rest of the major EVM set) plus Solana, XRPL, Bitcoin, Tron, Stellar, and Sui. (Bitcoin is `token_balance` on native BTC only; Tron, Stellar, and Sui are `token_balance` only.) `trust()` is a curated profile spanning the 25–27 chains where its dimensions live (see below). Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TON and Lightning/Spark are on the roadmap — WDK apps on those runtimes can still call `attest()` / `trust()` against any supported address the user holds.
 
 ## Why this exists
 
-WDK ships wallet modules and protocol modules (Swap, Bridge, Lending, Fiat) but has **no pre-transaction policy layer** — nothing to answer questions like "is this wallet allowed to receive this payment?" or "does this counterparty pass a sanctions and trust screen?" before signing.
+WDK shipped a local transaction **policy engine** in beta.11 (`wdk.registerPolicy(...)`) — the enforcement layer that gates write-facing operations *before* a wallet signs. A policy rule's `ALLOW`/`DENY` decision runs a **condition**: a function that answers "should this operation proceed?" The engine deliberately leaves that function to you.
 
-This package fills that gap as a first-class WDK protocol:
+This package *is* that condition. `attest()` is an async, on-chain, cryptographically signed check you drop straight into a policy rule — so apps don't hand-roll balance / NFT / staking reads per policy. The engine is **default-deny on governed accounts**, so the idiomatic shape is an `ALLOW` gated on the check passing (which is also fail-closed for free: if the call throws, the `ALLOW` simply doesn't match and the op is denied):
+
+```js
+import WalletAuth from '@insumermodel/wdk-protocol-wallet-auth'
+
+const walletAuth = new WalletAuth({ apiKey: process.env.INSUMER_API_KEY })
+
+wdk.registerPolicy({
+  id: 'counterparty-trust',
+  scope: 'project',
+  rules: [{
+    name: 'allow-transfer-if-counterparty-passes',
+    operation: 'transfer',
+    action: 'ALLOW',
+    conditions: [async ({ params }) =>
+      (await walletAuth.attest({
+        address: params.to,
+        conditions: [{ type: 'token_balance', contractAddress: '0xA0b8...', chainId: 1, threshold: 1000, decimals: 6 }]
+      })).passed
+    ]
+  }]
+})
+```
+
+It also works **standalone**, with or without WDK — call `attest()` / `trust()` directly before broadcasting:
 
 ```js
 import InsumerWalletAuthProtocol from '@insumermodel/wdk-protocol-wallet-auth'
 
 const walletAuth = new InsumerWalletAuthProtocol({ apiKey: process.env.INSUMER_API_KEY })
 
-// Before broadcasting a transaction, verify the counterparty:
 const { passed, sig, kid } = await walletAuth.attest({
   address: '0xCounterparty...',
   conditions: [
@@ -88,6 +111,8 @@ const result = await walletAuth.attest({
     { type: 'token_balance', contractAddress: '0xA0b8...', chainId: 1, threshold: 1000, decimals: 6 },
     { type: 'nft_ownership', contractAddress: '0xBC4C...', chainId: 1 }
   ],
+  // Non-EVM conditions need their matching address field:
+  // solanaAddress, xrplAddress, bitcoinAddress, tronAddress, stellarAddress, suiAddress
   jwt: true,          // optional: also return an ES256 JWT
   merkleProof: true   // optional: include EIP-1186 Merkle storage proofs (2 credits instead of 1)
 })
@@ -99,18 +124,21 @@ const result = await walletAuth.attest({
 // result.creditsRemaining — credits remaining on the API key
 ```
 
-Supported condition types: `token_balance`, `nft_ownership`, `eas_attestation`, `farcaster_id`. Supported chains: 30 EVM chains plus Solana, XRPL, and Bitcoin. See the [InsumerAPI OpenAPI spec](https://insumermodel.com/openapi.yaml) for the full schema.
+Supported condition types: `token_balance`, `nft_ownership`, `eas_attestation`, `farcaster_id`. Supported chains: 37 — 31 EVM networks plus Solana, XRPL, Bitcoin, Tron, Stellar, and Sui. Each non-EVM chain needs its address passed in the matching option (`solanaAddress`, `xrplAddress`, `bitcoinAddress`, `tronAddress`, `stellarAddress`, `suiAddress`). See the [InsumerAPI OpenAPI spec](https://insumermodel.com/openapi.yaml) for the full schema.
 
 ### `trust(options)` → `Promise<TrustResult>`
 
-Returns a multi-dimensional trust profile: 36+ signed checks across stablecoins, governance, NFTs, staking, and (optionally) Solana, XRPL, and Bitcoin dimensions. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
+Returns a multi-dimensional trust profile: 44 base checks across 25 chains in 5 dimensions (stablecoins, governance, NFTs, staking, institutional_stablecoins), rising to up to 49 checks across 27 chains in 9 dimensions when the optional `solanaAddress`, `xrplAddress`, `bitcoinAddress`, `tronAddress`, `stellarAddress`, or `suiAddress` are supplied. Each check is individually signed. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
 
 ```js
 const { trust, sig, kid } = await walletAuth.trust({
   address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-  solanaAddress: '...',  // optional, adds Solana dimension
-  xrplAddress: '...',    // optional, adds XRPL dimension
-  bitcoinAddress: '...'  // optional, adds Bitcoin dimension
+  solanaAddress: '...',   // optional, adds Solana dimension
+  xrplAddress: '...',     // optional, adds XRPL stablecoin checks
+  bitcoinAddress: '...',  // optional, adds Bitcoin Holdings dimension
+  tronAddress: '...',     // optional, adds Tron USDT-TRC20 dimension
+  stellarAddress: '...',  // optional, adds USDC + BENJI on Stellar
+  suiAddress: '...'       // optional, adds USDC on Sui
 })
 
 // trust.id         — TRST-XXXXX profile id

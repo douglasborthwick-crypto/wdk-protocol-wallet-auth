@@ -118,6 +118,9 @@ export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
     if (options.solanaAddress) body.solanaWallet = options.solanaAddress
     if (options.xrplAddress) body.xrplWallet = options.xrplAddress
     if (options.bitcoinAddress) body.bitcoinWallet = options.bitcoinAddress
+    if (options.tronAddress) body.tronWallet = options.tronAddress
+    if (options.stellarAddress) body.stellarWallet = options.stellarAddress
+    if (options.suiAddress) body.suiWallet = options.suiAddress
     if (options.jwt) body.format = 'jwt'
     if (options.merkleProof) body.proof = 'merkle'
 
@@ -153,6 +156,9 @@ export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
     if (options.solanaAddress) body.solanaWallet = options.solanaAddress
     if (options.xrplAddress) body.xrplWallet = options.xrplAddress
     if (options.bitcoinAddress) body.bitcoinWallet = options.bitcoinAddress
+    if (options.tronAddress) body.tronWallet = options.tronAddress
+    if (options.stellarAddress) body.stellarWallet = options.stellarAddress
+    if (options.suiAddress) body.suiWallet = options.suiAddress
     if (options.merkleProof) body.proof = 'merkle'
 
     const payload = await this._post('/v1/trust', body)

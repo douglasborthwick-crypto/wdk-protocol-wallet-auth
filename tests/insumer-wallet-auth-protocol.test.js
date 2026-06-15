@@ -146,10 +146,41 @@ test('trust() forwards multi-chain addresses', async () => {
     address: '0xabc',
     solanaAddress: 'Sol111',
     xrplAddress: 'rXRP',
-    bitcoinAddress: 'bc1q'
+    bitcoinAddress: 'bc1q',
+    tronAddress: 'TWdc',
+    stellarAddress: 'GB3Z',
+    suiAddress: '0xsui'
   })
   assert.equal(capturedBody.wallet, '0xabc')
   assert.equal(capturedBody.solanaWallet, 'Sol111')
   assert.equal(capturedBody.xrplWallet, 'rXRP')
   assert.equal(capturedBody.bitcoinWallet, 'bc1q')
+  assert.equal(capturedBody.tronWallet, 'TWdc')
+  assert.equal(capturedBody.stellarWallet, 'GB3Z')
+  assert.equal(capturedBody.suiWallet, '0xsui')
+})
+
+test('attest() forwards non-EVM addresses', async () => {
+  let capturedBody
+  const fetch = mockFetch((_url, init) => {
+    capturedBody = JSON.parse(init.body)
+    return { status: 200, body: { ok: true, data: { attestation: { pass: true } }, meta: {} } }
+  })
+  const proto = new InsumerWalletAuthProtocol({ apiKey: 'k', fetch })
+  await proto.attest({
+    address: '0xabc',
+    conditions: [{ type: 'token_balance', chainId: 'tron', contractAddress: 'native' }],
+    solanaAddress: 'Sol111',
+    xrplAddress: 'rXRP',
+    bitcoinAddress: 'bc1q',
+    tronAddress: 'TWdc',
+    stellarAddress: 'GB3Z',
+    suiAddress: '0xsui'
+  })
+  assert.equal(capturedBody.solanaWallet, 'Sol111')
+  assert.equal(capturedBody.xrplWallet, 'rXRP')
+  assert.equal(capturedBody.bitcoinWallet, 'bc1q')
+  assert.equal(capturedBody.tronWallet, 'TWdc')
+  assert.equal(capturedBody.stellarWallet, 'GB3Z')
+  assert.equal(capturedBody.suiWallet, '0xsui')
 })

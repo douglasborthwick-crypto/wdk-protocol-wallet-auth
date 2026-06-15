@@ -13,7 +13,7 @@
  * defines a pre-transaction verification protocol: given a wallet and a set
  * of on-chain conditions, return a cryptographically signed pass/fail
  * (attestation) or a multi-dimensional trust profile. The output is an
- * ECDSA-signed credential the caller can verify offline; no secrets, no
+ * ECDSA-signed result the caller can verify offline; no secrets, no
  * identity-first, no static credentials.
  *
  * Implementations (e.g. InsumerWalletAuthProtocol) call an external
@@ -51,6 +51,9 @@
  * @property {string} [solanaAddress] - Solana address, if different from the default EVM address.
  * @property {string} [xrplAddress] - XRPL r-address.
  * @property {string} [bitcoinAddress] - Bitcoin address.
+ * @property {string} [tronAddress] - Tron address (T-prefix, base58, 34 chars). Required for any `chainId: "tron"` condition.
+ * @property {string} [stellarAddress] - Stellar address (G-prefix StrKey, 56 chars). Required for any `chainId: "stellar"` condition.
+ * @property {string} [suiAddress] - Sui address (0x + 64 hex chars). Required for any `chainId: "sui"` condition.
  * @property {boolean} [jwt] - If true, request an ES256 JWT alongside the attestation.
  * @property {boolean} [merkleProof] - If true, request EIP-1186 Merkle storage proofs (costs 2 credits instead of 1).
  */
@@ -69,9 +72,12 @@
 /**
  * @typedef {Object} TrustOptions
  * @property {string} [address] - EVM address to profile. Defaults to the attached account.
- * @property {string} [solanaAddress] - Optional Solana address.
- * @property {string} [xrplAddress] - Optional XRPL r-address.
- * @property {string} [bitcoinAddress] - Optional Bitcoin address.
+ * @property {string} [solanaAddress] - Optional Solana address (adds Solana dimension).
+ * @property {string} [xrplAddress] - Optional XRPL r-address (adds XRPL stablecoin checks).
+ * @property {string} [bitcoinAddress] - Optional Bitcoin address (adds Bitcoin Holdings dimension).
+ * @property {string} [tronAddress] - Optional Tron address (adds Tron USDT-TRC20 dimension).
+ * @property {string} [stellarAddress] - Optional Stellar address (adds USDC + BENJI on Stellar to institutional_stablecoins).
+ * @property {string} [suiAddress] - Optional Sui address (adds USDC on Sui to institutional_stablecoins).
  * @property {boolean} [merkleProof] - If true, request Merkle proofs (costs 6 credits instead of 3).
  */
 
