@@ -30,7 +30,7 @@
 
 /**
  * @typedef {Object} Condition
- * @property {"token_balance"|"nft_ownership"|"eas_attestation"|"farcaster_id"} type
+ * @property {"token_balance"|"nft_ownership"|"eas_attestation"|"farcaster_id"|"evm_view_call"|"ratio_to_amount"|"ratio_to_supply"|"erc8004_agent"|"erc7710_delegation"} type
  * @property {string} [contractAddress]
  * @property {(number|string)} [chainId]
  * @property {(number|string|bigint)} [threshold]
@@ -41,6 +41,14 @@
  * @property {string} [indexer]
  * @property {string} [template]
  * @property {string} [currency]
+ * @property {string} [selector] - evm_view_call: canonical signature of a single-address-argument view function returning bool, e.g. "hasAccess(address)". RPC EVM chains only.
+ * @property {string} [multiple] - ratio_to_amount: collateralization multiple as a decimal string.
+ * @property {string} [amount] - ratio_to_amount: reference amount in token units as a decimal string.
+ * @property {string} [minFraction] - ratio_to_supply: required share of totalSupply, decimal string in (0,1].
+ * @property {string} [agentId] - erc8004_agent (Base only): the agent ID as a uint256 decimal string. Met iff the wallet owns the agent NFT or is the registry agentWallet binding; registration is permissionless, no vetting implied.
+ * @property {string} [delegationManager] - erc7710_delegation (Base only): recognized MetaMask Delegation Framework manager address.
+ * @property {string} [expectedDelegator] - erc7710_delegation: the principal the caller asserts. Required; the condition fails unless the delegation's delegator matches.
+ * @property {Object} [delegation] - erc7710_delegation: the signed delegation ({delegator, delegate, authority, caveats, salt, signature}). Met iff the wallet is the delegate, the signature verifies (EOA or ERC-1271), unrevoked at the anchored block, all caveat enforcers recognized, time windows satisfied. Limits are reported as declaredLimits, not simulated; these attestations expire in 5 minutes.
  * @property {string} [label]
  */
 
