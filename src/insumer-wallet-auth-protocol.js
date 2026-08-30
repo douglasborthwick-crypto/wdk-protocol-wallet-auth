@@ -112,8 +112,18 @@ export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
 
     const address = options.address || await this._defaultAddress()
 
+    // token_balance thresholds go to the wire as decimal strings: keys minted
+    // today sign under the v2 scheme and reject a JSON number with 400, while
+    // pre-cutover v1 keys accept the string form unchanged.
+    const conditions = options.conditions.map((c) => {
+      if (c && c.type === 'token_balance' && c.threshold !== undefined && c.threshold !== null && typeof c.threshold !== 'string') {
+        return { ...c, threshold: c.threshold.toString() }
+      }
+      return c
+    })
+
     /** @type {Record<string, any>} */
-    const body = { conditions: options.conditions }
+    const body = { conditions }
     if (address) body.wallet = address
     if (options.solanaAddress) body.solanaWallet = options.solanaAddress
     if (options.xrplAddress) body.xrplWallet = options.xrplAddress

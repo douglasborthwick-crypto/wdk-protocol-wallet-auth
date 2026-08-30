@@ -33,7 +33,7 @@
  * @property {"token_balance"|"nft_ownership"|"eas_attestation"|"farcaster_id"|"evm_view_call"|"ratio_to_amount"|"ratio_to_supply"|"erc8004_agent"|"erc7710_delegation"} type
  * @property {string} [contractAddress]
  * @property {(number|string)} [chainId]
- * @property {(number|string|bigint)} [threshold]
+ * @property {(number|string|bigint)} [threshold] - Minimum balance in token units. Sent to the API as a decimal string; keys minted today require the string form.
  * @property {number} [decimals]
  * @property {string} [tokenId]
  * @property {string} [schemaId]

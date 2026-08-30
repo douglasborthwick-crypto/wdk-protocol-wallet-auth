@@ -27,7 +27,7 @@ wdk.registerPolicy({
     conditions: [async ({ params }) =>
       (await walletAuth.attest({
         address: params.to,
-        conditions: [{ type: 'token_balance', contractAddress: '0xA0b8...', chainId: 1, threshold: 1000, decimals: 6 }]
+        conditions: [{ type: 'token_balance', contractAddress: '0xA0b8...', chainId: 1, threshold: '1000', decimals: 6 }]
       })).passed
     ]
   }]
@@ -44,7 +44,7 @@ const walletAuth = new InsumerWalletAuthProtocol({ apiKey: process.env.INSUMER_A
 const { passed, sig, kid } = await walletAuth.attest({
   address: '0xCounterparty...',
   conditions: [
-    { type: 'token_balance', contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', chainId: 1, threshold: 1000, decimals: 6, label: 'USDC >= 1000' }
+    { type: 'token_balance', contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', chainId: 1, threshold: '1000', decimals: 6, label: 'USDC >= 1000' }
   ]
 })
 
@@ -108,7 +108,7 @@ Evaluates one to ten on-chain conditions against a wallet and returns a cryptogr
 const result = await walletAuth.attest({
   address: '0x1234...',                // defaults to bound account
   conditions: [
-    { type: 'token_balance', contractAddress: '0xA0b8...', chainId: 1, threshold: 1000, decimals: 6 },
+    { type: 'token_balance', contractAddress: '0xA0b8...', chainId: 1, threshold: '1000', decimals: 6 },
     { type: 'nft_ownership', contractAddress: '0xBC4C...', chainId: 1 }
   ],
   // Non-EVM conditions need their matching address field:

@@ -59,6 +59,7 @@ test('attest() posts to /v1/attest and returns a passed boolean', async () => {
   assert.equal(capturedUrl, 'https://api.insumermodel.com/v1/attest')
   assert.equal(capturedBody.wallet, '0x1234567890abcdef1234567890abcdef12345678')
   assert.equal(capturedBody.conditions.length, 1)
+  assert.equal(capturedBody.conditions[0].threshold, '1000')
   assert.equal(result.passed, true)
   assert.equal(result.sig, 'base64sigstring')
   assert.equal(result.kid, 'insumer-attest-v1')
