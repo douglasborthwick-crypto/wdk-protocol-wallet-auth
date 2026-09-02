@@ -120,7 +120,8 @@ const result = await walletAuth.attest({
 // result.passed           — true only if every condition is met
 // result.attestation      — full attestation object (per-condition results, block info, condition hash)
 // result.sig / result.kid — ECDSA P-256 signature + key id (verify against JWKS)
-// result.jwt              — ES256 JWT form, when requested
+// result.pqSig / pqKid    — ML-DSA-65 post-quantum companion + its key id (additive)
+// result.jwt / pqJwt      — ES256 JWT form and its post-quantum sibling, when requested
 // result.creditsRemaining — credits remaining on the API key
 ```
 
@@ -148,7 +149,7 @@ const { trust, sig, kid } = await walletAuth.trust({
 
 ## Verification
 
-Every attestation and trust result is ECDSA P-256 signed. The signature (`sig`) and key id (`kid`) let any party verify the result offline, without calling the API, using the public JWKS:
+Every attestation and trust result is ECDSA P-256 signed, and since September 2026 also carries an ML-DSA-65 post-quantum companion (`pqSig`, `pqKid`; `pqJwt` beside `jwt`). The signature (`sig`) and key id (`kid`) let any party verify the result offline, without calling the API, using the public JWKS, which holds the EC key under three kids and the post-quantum key under two RFC 9964 `AKP` entries; `insumer-verify` 1.8.1+ reports the companion as a fifth verdict:
 
 ```
 https://insumermodel.com/.well-known/jwks.json

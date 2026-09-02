@@ -41,7 +41,9 @@ test('attest() posts to /v1/attest and returns a passed boolean', async () => {
         data: {
           attestation: { pass: true, results: [{ met: true, label: 'USDC >= 1000' }], conditionHash: '0xabc' },
           sig: 'base64sigstring',
-          kid: 'insumer-attest-v1'
+          kid: 'insumer-attest-v2',
+          pqSig: 'base64pqsig',
+          pqKid: 'insumer-attest-pq1'
         },
         meta: { creditsRemaining: 99, creditsCharged: 1 }
       }
@@ -62,7 +64,9 @@ test('attest() posts to /v1/attest and returns a passed boolean', async () => {
   assert.equal(capturedBody.conditions[0].threshold, '1000')
   assert.equal(result.passed, true)
   assert.equal(result.sig, 'base64sigstring')
-  assert.equal(result.kid, 'insumer-attest-v1')
+  assert.equal(result.kid, 'insumer-attest-v2')
+  assert.equal(result.pqSig, 'base64pqsig')
+  assert.equal(result.pqKid, 'insumer-attest-pq1')
   assert.equal(result.creditsRemaining, 99)
   assert.equal(result.creditsCharged, 1)
 })

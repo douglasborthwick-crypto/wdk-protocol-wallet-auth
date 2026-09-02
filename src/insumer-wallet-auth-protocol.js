@@ -144,6 +144,9 @@ export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
       sig: data.sig,
       kid: data.kid,
       jwt: data.jwt,
+      pqSig: data.pqSig,
+      pqKid: data.pqKid,
+      pqJwt: data.pqJwt,
       creditsRemaining: meta.creditsRemaining,
       creditsCharged: meta.creditsCharged
     }
@@ -179,6 +182,8 @@ export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
       trust: data.trust,
       sig: data.sig,
       kid: data.kid,
+      pqSig: data.pqSig,
+      pqKid: data.pqKid,
       creditsRemaining: meta.creditsRemaining,
       creditsCharged: meta.creditsCharged
     }

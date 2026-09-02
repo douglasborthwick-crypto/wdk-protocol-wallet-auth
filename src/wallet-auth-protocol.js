@@ -71,8 +71,11 @@
  * @property {boolean} passed - True if every condition is met.
  * @property {Object} attestation - Raw attestation object (condition-by-condition results, block numbers, condition hash).
  * @property {string} sig - ECDSA P-256 signature over the attestation (base64).
- * @property {string} kid - Key ID identifying the signing key in the JWKS.
+ * @property {string} kid - Key ID identifying the signing key in the JWKS; it also selects the signed preimage (insumer-attest-v1 or insumer-attest-v2).
  * @property {string} [jwt] - ES256 JWT form of the attestation, when requested.
+ * @property {string} [pqSig] - Post-quantum companion signature (ML-DSA-65, FIPS 204) over the same preimage under a post-quantum domain tag. Additive beside sig.
+ * @property {string} [pqKid] - Key ID of the companion in the JWKS (insumer-attest-pq1, an RFC 9964 AKP entry).
+ * @property {string} [pqJwt] - Post-quantum companion of jwt (compact JWS, alg ML-DSA-65), when jwt was requested.
  * @property {number} creditsRemaining - Credits remaining on the API key after this call.
  * @property {number} creditsCharged - Credits consumed by this call.
  */
@@ -94,6 +97,8 @@
  * @property {Object} trust - Full trust profile (dimensions, checks, summary, profile id).
  * @property {string} sig - ECDSA P-256 signature over the trust object.
  * @property {string} kid - Key ID identifying the signing key in the JWKS.
+ * @property {string} [pqSig] - Post-quantum companion signature (ML-DSA-65) over the trust preimage under a post-quantum domain tag.
+ * @property {string} [pqKid] - Key ID of the companion in the JWKS (insumer-trust-pq1).
  * @property {number} creditsRemaining
  * @property {number} creditsCharged
  */
