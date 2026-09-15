@@ -10,7 +10,7 @@ Powered by [InsumerAPI](https://insumermodel.com). `attest()` covers **38 chains
 
 WDK shipped a local transaction **policy engine** in beta.11 (`wdk.registerPolicy(...)`) — the enforcement layer that gates write-facing operations *before* a wallet signs. A policy rule's `ALLOW`/`DENY` decision runs a **condition**: a function that answers "should this operation proceed?" The engine deliberately leaves that function to you.
 
-This package *is* that condition. `attest()` is an async, on-chain, cryptographically signed check you drop straight into a policy rule — so apps don't hand-roll balance / NFT / staking reads per policy. The engine is **default-deny on governed accounts**, so the idiomatic shape is an `ALLOW` gated on the check passing (which is also fail-closed for free: if the call throws, the `ALLOW` simply doesn't match and the op is denied):
+This package *is* that condition. `attest()` is an async, on-chain, cryptographically signed check you drop straight into a policy rule — so apps don't hand-roll balance / NFT / staking reads per policy. The engine is **default-deny on governed accounts**, so the idiomatic shape is an `ALLOW` gated on the check passing (which is also fail-closed for free: if the call throws, the `ALLOW` simply doesn't match and the op is denied). This snippet targets WDK `1.0.0-beta.16` and later, where conditions receive the call's arguments as `args`:
 
 ```js
 import WalletAuth from '@insumermodel/wdk-protocol-wallet-auth'
@@ -19,14 +19,16 @@ const walletAuth = new WalletAuth({ apiKey: process.env.INSUMER_API_KEY })
 
 wdk.registerPolicy({
   id: 'counterparty-trust',
+  name: 'Counterparty must pass wallet auth',
   scope: 'project',
   rules: [{
     name: 'allow-transfer-if-counterparty-passes',
     operation: 'transfer',
     action: 'ALLOW',
-    conditions: [async ({ params }) =>
+    // Conditions read the call's arguments from `args`; a transfer's recipient is args[0].recipient
+    conditions: [async ({ args }) =>
       (await walletAuth.attest({
-        address: params.to,
+        address: args[0].recipient,
         conditions: [{ type: 'token_balance', contractAddress: '0xA0b8...', chainId: 1, threshold: '1000', decimals: 6 }]
       })).passed
     ]
