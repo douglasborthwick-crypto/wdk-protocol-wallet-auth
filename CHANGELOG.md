@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.6 (2026-09-21)
+
+- README: aligns the trust profile counts with the engine as of 2026-09-21, when USDC on Arc became a trust check: 45 base checks across 26 chains in 5 dimensions (was 44 across 25), up to 50 across 28 chains in 9 dimensions with the optional wallets (was 49 across 27).
+
 ## 0.2.5 (2026-09-20)
 
 - Aligns chain counts with the engine: 37 chains, 31 EVM networks; NFT ownership on 33 (31 EVM + Solana + XRPL).

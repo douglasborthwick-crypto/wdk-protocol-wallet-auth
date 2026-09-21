@@ -4,7 +4,7 @@
 
 The wallet auth primitive (read → evaluate → sign) packaged for [Wallet Development Kit](https://docs.wdk.tether.io/) apps. **Pre-transaction, condition-based access.** Given a wallet and a set of on-chain conditions, it returns a cryptographically signed pass/fail (`attest`) or a multi-dimensional trust profile (`trust`). Results are ECDSA P-256 signed and verifiable offline against a public JWKS — no secrets, no identity-first, no static credentials. It composes with WDK's transaction policy engine as a signed condition, and works standalone anywhere else.
 
-Powered by [InsumerAPI](https://insumermodel.com). `attest()` covers **37 chains**: 31 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, Robinhood Chain, and the rest of the major EVM set) plus Solana, XRPL, Bitcoin, Tron, Stellar, and Sui. (Bitcoin is `token_balance` on native BTC only; Tron, Stellar, and Sui are `token_balance` only.) `trust()` is a curated profile spanning the 25–27 chains where its dimensions live (see below). Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TON and Lightning/Spark are on the roadmap. WDK apps on those runtimes can still call `attest()` / `trust()` against any supported address the user holds.
+Powered by [InsumerAPI](https://insumermodel.com). `attest()` covers **37 chains**: 31 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, Robinhood Chain, and the rest of the major EVM set) plus Solana, XRPL, Bitcoin, Tron, Stellar, and Sui. (Bitcoin is `token_balance` on native BTC only; Tron, Stellar, and Sui are `token_balance` only.) `trust()` is a curated profile spanning the 26–28 chains where its dimensions live (see below). Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TON and Lightning/Spark are on the roadmap. WDK apps on those runtimes can still call `attest()` / `trust()` against any supported address the user holds.
 
 ## Why this exists
 
@@ -131,7 +131,7 @@ Supported condition types: `token_balance`, `nft_ownership` (33 of the 37 chains
 
 ### `trust(options)` → `Promise<TrustResult>`
 
-Returns a multi-dimensional trust profile: 44 base checks across 25 chains in 5 dimensions (stablecoins, governance, NFTs, staking, institutional_stablecoins), rising to up to 49 checks across 27 chains in 9 dimensions when the optional `solanaAddress`, `xrplAddress`, `bitcoinAddress`, `tronAddress`, `stellarAddress`, or `suiAddress` are supplied. The profile is signed as a whole. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
+Returns a multi-dimensional trust profile: 45 base checks across 26 chains in 5 dimensions (stablecoins, governance, NFTs, staking, institutional_stablecoins), rising to up to 50 checks across 28 chains in 9 dimensions when the optional `solanaAddress`, `xrplAddress`, `bitcoinAddress`, `tronAddress`, `stellarAddress`, or `suiAddress` are supplied. The profile is signed as a whole. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
 
 ```js
 const { trust, sig, kid, pqSig, pqKid } = await walletAuth.trust({
