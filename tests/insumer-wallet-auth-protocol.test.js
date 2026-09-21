@@ -189,3 +189,22 @@ test('attest() forwards non-EVM addresses', async () => {
   assert.equal(capturedBody.stellarWallet, 'GB3Z')
   assert.equal(capturedBody.suiWallet, '0xsui')
 })
+
+test('attest() sends numeric thresholds as plain decimal strings, never in exponent notation', async () => {
+  let capturedBody
+  const fetch = mockFetch((_url, init) => {
+    capturedBody = JSON.parse(init.body)
+    return { status: 200, body: { ok: true, data: { attestation: { pass: true } }, meta: {} } }
+  })
+  const proto = new InsumerWalletAuthProtocol({ apiKey: 'k', fetch })
+  await proto.attest({
+    address: '0x0000000000000000000000000000000000000001',
+    conditions: [
+      { type: 'token_balance', threshold: 1e-7 },
+      { type: 'token_balance', threshold: 1e21 },
+      { type: 'token_balance', threshold: 1000.5 },
+      { type: 'token_balance', threshold: '0.001' }
+    ]
+  })
+  assert.deepEqual(capturedBody.conditions.map((c) => c.threshold), ['0.0000001', '1000000000000000000000', '1000.5', '0.001'])
+})

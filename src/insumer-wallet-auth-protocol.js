@@ -21,6 +21,24 @@ const DEFAULT_BASE_URL = 'https://api.insumermodel.com'
  * https://insumermodel.com/.well-known/jwks.json using any standard JWT or
  * JOSE library (or the `insumer-verify` npm package).
  */
+/**
+ * A number as a plain decimal string. Number#toString switches to exponent
+ * notation below 1e-6 and from 1e21 ("1e-7"), which is not a decimal string.
+ *
+ * @param {number|bigint} v
+ * @returns {string}
+ */
+function plainDecimal (v) {
+  const s = String(v)
+  const m = /^(-?)(\d+)(?:\.(\d+))?e([+-])(\d+)$/i.exec(s)
+  if (!m) return s
+  const digits = m[2] + (m[3] || '')
+  const point = m[2].length + (m[4] === '-' ? -Number(m[5]) : Number(m[5]))
+  if (point <= 0) return `${m[1]}0.${'0'.repeat(-point)}${digits}`
+  if (point >= digits.length) return `${m[1]}${digits}${'0'.repeat(point - digits.length)}`
+  return `${m[1]}${digits.slice(0, point)}.${digits.slice(point)}`
+}
+
 export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
   /**
    * @param {Object} options
@@ -117,7 +135,7 @@ export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
     // pre-cutover v1 keys accept the string form unchanged.
     const conditions = options.conditions.map((c) => {
       if (c && c.type === 'token_balance' && c.threshold !== undefined && c.threshold !== null && typeof c.threshold !== 'string') {
-        return { ...c, threshold: c.threshold.toString() }
+        return { ...c, threshold: plainDecimal(c.threshold) }
       }
       return c
     })

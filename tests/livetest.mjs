@@ -35,7 +35,6 @@ async function run () {
         contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         chainId: 1,
         threshold: 1,
-        decimals: 6,
         label: 'USDC >= 1'
       }
     ],

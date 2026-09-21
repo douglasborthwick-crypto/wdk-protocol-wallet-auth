@@ -34,14 +34,14 @@
  * @property {string} [contractAddress]
  * @property {(number|string)} [chainId]
  * @property {(number|string|bigint)} [threshold] - Minimum balance in token units. Sent to the API as a decimal string; keys minted today require the string form.
- * @property {number} [decimals]
+ * @property {number} [decimals] - Optional. Leave it out: the token's own decimals are always read from the chain. If sent it is only a cross-check, and a value that differs from the token's own decimals is rejected with a 400.
  * @property {string} [tokenId]
  * @property {string} [schemaId]
  * @property {string} [attester]
  * @property {string} [indexer]
  * @property {string} [template]
  * @property {string} [currency]
- * @property {string} [selector] - evm_view_call: canonical signature of a single-address-argument view function returning bool, e.g. "hasAccess(address)". RPC EVM chains only.
+ * @property {string} [selector] - evm_view_call: canonical signature of a single-address-argument view function returning bool, e.g. "hasAccess(address)". EVM chains only.
  * @property {string} [multiple] - ratio_to_amount: collateralization multiple as a decimal string.
  * @property {string} [amount] - ratio_to_amount: reference amount in token units as a decimal string.
  * @property {string} [minFraction] - ratio_to_supply: required share of totalSupply, decimal string in (0,1].
@@ -120,8 +120,8 @@ export class IWalletAuthProtocol {
 
   /**
    * Return a multi-dimensional trust profile for a wallet across stablecoins,
-   * governance, NFTs, and staking activity (plus optional Solana, XRPL, and
-   * Bitcoin dimensions). Each check is individually signed.
+   * governance, NFTs, and staking activity (plus optional Solana, XRPL, Bitcoin,
+   * Tron, Stellar and Sui dimensions). The profile is signed as a whole.
    *
    * @param {TrustOptions} [options]
    * @returns {Promise<TrustResult>}

@@ -26,7 +26,7 @@
  * @property {string} [contractAddress]
  * @property {(number|string)} [chainId]
  * @property {(number|string|bigint)} [threshold]
- * @property {number} [decimals]
+ * @property {number} [decimals] - Optional. Leave it out: the token's own decimals are always read from the chain. If sent it is only a cross-check, and a value that differs from the token's own decimals is rejected with a 400.
  * @property {string} [tokenId]
  * @property {string} [schemaId]
  * @property {string} [attester]
@@ -91,8 +91,8 @@ export class IWalletAuthProtocol {
     attest(options: AttestOptions): Promise<AttestResult>;
     /**
      * Return a multi-dimensional trust profile for a wallet across stablecoins,
-     * governance, NFTs, and staking activity (plus optional Solana, XRPL, and
-     * Bitcoin dimensions). Each check is individually signed.
+     * governance, NFTs, and staking activity (plus optional Solana, XRPL, Bitcoin,
+     * Tron, Stellar and Sui dimensions). The profile is signed as a whole.
      *
      * @param {TrustOptions} [options]
      * @returns {Promise<TrustResult>}
@@ -135,6 +135,9 @@ export type Condition = {
     contractAddress?: string | undefined;
     chainId?: string | number | undefined;
     threshold?: string | number | bigint | undefined;
+    /**
+     * - Optional. Leave it out: the token's own decimals are always read from the chain. If sent it is only a cross-check, and a value that differs from the token's own decimals is rejected with a 400.
+     */
     decimals?: number | undefined;
     tokenId?: string | undefined;
     schemaId?: string | undefined;
