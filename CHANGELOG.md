@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.7 (2026-09-21)
+
+- The published type declarations are regenerated from the source JSDoc. They had fallen behind: `Condition.type` now includes `evm_view_call`, `ratio_to_amount`, `ratio_to_supply`, `erc8004_agent` and `erc7710_delegation` with their fields, and the attest and trust results carry the post-quantum companion fields (`pqSig`, `pqKid`, `pqJwt`).
+- README: only the Solana, XRPL, Bitcoin and Tron addresses add trust checks; the Stellar and Sui checks are already among the 45 base checks.
+
 ## 0.2.6 (2026-09-21)
 
 - README: aligns the trust profile counts with the engine as of 2026-09-21, when USDC on Arc became a trust check: 45 base checks across 26 chains in 5 dimensions (was 44 across 25), up to 50 across 28 chains in 9 dimensions with the optional wallets (was 49 across 27).

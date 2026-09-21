@@ -131,7 +131,7 @@ Supported condition types: `token_balance`, `nft_ownership` (33 of the 37 chains
 
 ### `trust(options)` → `Promise<TrustResult>`
 
-Returns a multi-dimensional trust profile: 45 base checks across 26 chains in 5 dimensions (stablecoins, governance, NFTs, staking, institutional_stablecoins), rising to up to 50 checks across 28 chains in 9 dimensions when the optional `solanaAddress`, `xrplAddress`, `bitcoinAddress`, `tronAddress`, `stellarAddress`, or `suiAddress` are supplied. The profile is signed as a whole. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
+Returns a multi-dimensional trust profile: 45 base checks across 26 chains in 5 dimensions (stablecoins, governance, NFTs, staking, institutional_stablecoins), rising to up to 50 checks across 28 chains in 9 dimensions when the optional `solanaAddress`, `xrplAddress`, `bitcoinAddress` and `tronAddress` are supplied (each adds its own dimension). `stellarAddress` and `suiAddress` add no checks: their institutional stablecoin checks are already among the 45 and are evaluated once the matching address is supplied, as are the Solana and XRPL ones. The profile is signed as a whole. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
 
 ```js
 const { trust, sig, kid, pqSig, pqKid } = await walletAuth.trust({

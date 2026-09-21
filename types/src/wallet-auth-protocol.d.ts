@@ -22,10 +22,10 @@
 /** @typedef {import('@tetherto/wdk-wallet').IWalletAccount} IWalletAccount */
 /**
  * @typedef {Object} Condition
- * @property {"token_balance"|"nft_ownership"|"eas_attestation"|"farcaster_id"} type
+ * @property {"token_balance"|"nft_ownership"|"eas_attestation"|"farcaster_id"|"evm_view_call"|"ratio_to_amount"|"ratio_to_supply"|"erc8004_agent"|"erc7710_delegation"} type
  * @property {string} [contractAddress]
  * @property {(number|string)} [chainId]
- * @property {(number|string|bigint)} [threshold]
+ * @property {(number|string|bigint)} [threshold] - Minimum balance in token units. Sent to the API as a decimal string; keys minted today require the string form.
  * @property {number} [decimals] - Optional. Leave it out: the token's own decimals are always read from the chain. If sent it is only a cross-check, and a value that differs from the token's own decimals is rejected with a 400.
  * @property {string} [tokenId]
  * @property {string} [schemaId]
@@ -33,6 +33,14 @@
  * @property {string} [indexer]
  * @property {string} [template]
  * @property {string} [currency]
+ * @property {string} [selector] - evm_view_call: canonical signature of a single-address-argument view function returning bool, e.g. "hasAccess(address)". EVM chains only.
+ * @property {string} [multiple] - ratio_to_amount: collateralization multiple as a decimal string.
+ * @property {string} [amount] - ratio_to_amount: reference amount in token units as a decimal string.
+ * @property {string} [minFraction] - ratio_to_supply: required share of totalSupply, decimal string in (0,1].
+ * @property {string} [agentId] - erc8004_agent (Base only): the agent ID as a uint256 decimal string. Met iff the wallet owns the agent NFT or is the registry agentWallet binding; registration is permissionless, no vetting implied.
+ * @property {string} [delegationManager] - erc7710_delegation (Base only): recognized MetaMask Delegation Framework manager address.
+ * @property {string} [expectedDelegator] - erc7710_delegation: the principal the caller asserts. Required; the condition fails unless the delegation's delegator matches.
+ * @property {Object} [delegation] - erc7710_delegation: the signed delegation ({delegator, delegate, authority, caveats, salt, signature}). Met iff the wallet is the delegate, the signature verifies (EOA or ERC-1271), unrevoked at the anchored block, all caveat enforcers recognized, time windows satisfied. Limits are reported as declaredLimits, not simulated; these attestations expire in 5 minutes.
  * @property {string} [label]
  */
 /**
@@ -53,8 +61,11 @@
  * @property {boolean} passed - True if every condition is met.
  * @property {Object} attestation - Raw attestation object (condition-by-condition results, block numbers, condition hash).
  * @property {string} sig - ECDSA P-256 signature over the attestation (base64).
- * @property {string} kid - Key ID identifying the signing key in the JWKS.
+ * @property {string} kid - Key ID identifying the signing key in the JWKS; it also selects the signed preimage (insumer-attest-v1 or insumer-attest-v2).
  * @property {string} [jwt] - ES256 JWT form of the attestation, when requested.
+ * @property {string} [pqSig] - Post-quantum companion signature (ML-DSA-65, FIPS 204) over the same preimage under a post-quantum domain tag. Additive beside sig.
+ * @property {string} [pqKid] - Key ID of the companion in the JWKS (insumer-attest-pq1, an RFC 9964 AKP entry).
+ * @property {string} [pqJwt] - Post-quantum companion of jwt (compact JWS, alg ML-DSA-65), when jwt was requested.
  * @property {number} creditsRemaining - Credits remaining on the API key after this call.
  * @property {number} creditsCharged - Credits consumed by this call.
  */
@@ -74,6 +85,8 @@
  * @property {Object} trust - Full trust profile (dimensions, checks, summary, profile id).
  * @property {string} sig - ECDSA P-256 signature over the trust object.
  * @property {string} kid - Key ID identifying the signing key in the JWKS.
+ * @property {string} [pqSig] - Post-quantum companion signature (ML-DSA-65) over the trust preimage under a post-quantum domain tag.
+ * @property {string} [pqKid] - Key ID of the companion in the JWKS (insumer-trust-pq1).
  * @property {number} creditsRemaining
  * @property {number} creditsCharged
  */
@@ -131,9 +144,12 @@ export default class WalletAuthProtocol implements IWalletAuthProtocol {
 export type IWalletAccountReadOnly = any;
 export type IWalletAccount = any;
 export type Condition = {
-    type: "token_balance" | "nft_ownership" | "eas_attestation" | "farcaster_id";
+    type: "token_balance" | "nft_ownership" | "eas_attestation" | "farcaster_id" | "evm_view_call" | "ratio_to_amount" | "ratio_to_supply" | "erc8004_agent" | "erc7710_delegation";
     contractAddress?: string | undefined;
     chainId?: string | number | undefined;
+    /**
+     * - Minimum balance in token units. Sent to the API as a decimal string; keys minted today require the string form.
+     */
     threshold?: string | number | bigint | undefined;
     /**
      * - Optional. Leave it out: the token's own decimals are always read from the chain. If sent it is only a cross-check, and a value that differs from the token's own decimals is rejected with a 400.
@@ -145,6 +161,38 @@ export type Condition = {
     indexer?: string | undefined;
     template?: string | undefined;
     currency?: string | undefined;
+    /**
+     * - evm_view_call: canonical signature of a single-address-argument view function returning bool, e.g. "hasAccess(address)". EVM chains only.
+     */
+    selector?: string | undefined;
+    /**
+     * - ratio_to_amount: collateralization multiple as a decimal string.
+     */
+    multiple?: string | undefined;
+    /**
+     * - ratio_to_amount: reference amount in token units as a decimal string.
+     */
+    amount?: string | undefined;
+    /**
+     * - ratio_to_supply: required share of totalSupply, decimal string in (0,1].
+     */
+    minFraction?: string | undefined;
+    /**
+     * - erc8004_agent (Base only): the agent ID as a uint256 decimal string. Met iff the wallet owns the agent NFT or is the registry agentWallet binding; registration is permissionless, no vetting implied.
+     */
+    agentId?: string | undefined;
+    /**
+     * - erc7710_delegation (Base only): recognized MetaMask Delegation Framework manager address.
+     */
+    delegationManager?: string | undefined;
+    /**
+     * - erc7710_delegation: the principal the caller asserts. Required; the condition fails unless the delegation's delegator matches.
+     */
+    expectedDelegator?: string | undefined;
+    /**
+     * - erc7710_delegation: the signed delegation ({delegator, delegate, authority, caveats, salt, signature}). Met iff the wallet is the delegate, the signature verifies (EOA or ERC-1271), unrevoked at the anchored block, all caveat enforcers recognized, time windows satisfied. Limits are reported as declaredLimits, not simulated; these attestations expire in 5 minutes.
+     */
+    delegation?: Object | undefined;
     label?: string | undefined;
 };
 export type AttestOptions = {
@@ -203,7 +251,7 @@ export type AttestResult = {
      */
     sig: string;
     /**
-     * - Key ID identifying the signing key in the JWKS.
+     * - Key ID identifying the signing key in the JWKS; it also selects the signed preimage (insumer-attest-v1 or insumer-attest-v2).
      */
     kid: string;
     /**
