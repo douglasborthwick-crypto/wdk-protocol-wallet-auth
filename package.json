@@ -15,11 +15,11 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/douglasborthwick-crypto/wdk-protocol-wallet-auth.git"
+    "url": "git+https://github.com/insumerapi/wdk-protocol-wallet-auth.git"
   },
   "homepage": "https://insumermodel.com/developers/wdk/",
   "bugs": {
-    "url": "https://github.com/douglasborthwick-crypto/wdk-protocol-wallet-auth/issues"
+    "url": "https://github.com/insumerapi/wdk-protocol-wallet-auth/issues"
   },
   "main": "index.js",
   "type": "module",

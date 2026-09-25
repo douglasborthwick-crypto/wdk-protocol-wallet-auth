@@ -172,4 +172,4 @@ Apache-2.0. See [LICENSE](./LICENSE).
 
 ## Maintainer
 
-Built by [Douglas Borthwick](https://insumermodel.com). Issues and contributions welcome at the [GitHub repo](https://github.com/douglasborthwick-crypto/wdk-protocol-wallet-auth).
+Built by [Douglas Borthwick](https://insumermodel.com). Issues and contributions welcome at the [GitHub repo](https://github.com/insumerapi/wdk-protocol-wallet-auth).
